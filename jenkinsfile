@@ -1,19 +1,48 @@
+// pipeline {
+//     agent any
+
+//     stages {
+//         stage('Clone Repository') {
+//             steps {
+//                 git url: 'https://github.com/Maram-Hassan/ansible-lab.git', branch: 'main', credentialsId: 'dd22c8fd-509b-467e-a5ee-10e58593b2c9'
+//             }
+//         }
+
+//         stage('Install Nexus') {
+//             steps {
+//                 ansiblePlaybook(
+//                     playbook: 'play-book.yml',
+//                     inventory: 'inventory',
+//                     credentialsId: 'b7728db5-7ee2-4294-afe8-fcaa0aaf4a2c',
+//                 )
+//             }
+//         }
+//     }
+// }
 pipeline {
     agent any
 
     stages {
         stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/Maram-Hassan/ansible-lab.git', branch: 'main', credentialsId: 'dd22c8fd-509b-467e-a5ee-10e58593b2c9'
+                // Clone the GitHub repository containing the Ansible playbook
+                git url: 'https://github.com/Maram-Hassan/ansible-lab.git', 
+                    branch: 'main', 
+                    credentialsId: 'dd22c8fd-509b-467e-a5ee-10e58593b2c9' 
+                    // Adjust to your GitHub credentials ID
             }
         }
 
         stage('Install Nexus') {
             steps {
+                // Execute Ansible playbook with a private key and inventory
                 ansiblePlaybook(
-                    playbook: 'play-book.yml',
-                    inventory: 'inventory',
+                    playbook: 'play-book.yml',   // Path to the playbook file
+                    inventory: 'inventory',      // Path to the inventory file
                     credentialsId: 'b7728db5-7ee2-4294-afe8-fcaa0aaf4a2c',
+                     // SSH Credentials ID for the Jenkins agent
+                    privateKey: 'ansible-ec2-key.pem', // Path to your SSH private key
+                    user: 'ubuntu'   // SSH user to connect to EC2 instance
                 )
             }
         }
