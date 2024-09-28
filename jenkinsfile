@@ -4,19 +4,16 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                // Clone the repository where your Ansible playbook is stored
-                git url: 'https://github.com/Maram-Hassan/ansible-lab.git', branch: 'main'
+                git url: 'https://github.com/Maram-Hassan/ansible-lab.git', branch: 'main', credentialsId: 'dd22c8fd-509b-467e-a5ee-10e58593b2c9'
             }
         }
-        
-        
+
         stage('Install Nexus') {
             steps {
-                // Run the Ansible playbook to install Nexus
                 ansiblePlaybook(
-                    playbook: 'play-book.yml', // Path to your Ansible playbook
-                    inventory: 'inventory', // Path to your inventory file
-                    credentialsId: 'b7728db5-7ee2-4294-afe8-fcaa0aaf4a2c', // ID of the SSH credentials added in Jenkins
+                    playbook: 'play-book.yml',
+                    inventory: 'inventory',
+                    credentialsId: 'b7728db5-7ee2-4294-afe8-fcaa0aaf4a2c',
                 )
             }
         }
