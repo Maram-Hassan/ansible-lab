@@ -9,6 +9,7 @@ pipeline {
             }
         }
         
+        
         stage('Install Nexus') {
             steps {
                 // Run the Ansible playbook to install Nexus
