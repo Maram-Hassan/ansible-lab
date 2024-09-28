@@ -1,2 +1,2 @@
 [nexus_server]
-54.209.250.2 ansible_user=ubuntu ansible_ssh_private_key_file=./ansible-ec2-key.pem
+34.234.73.160 ansible_user=ubuntu ansible_ssh_private_key_file=./ansible-ec2-key.pem
