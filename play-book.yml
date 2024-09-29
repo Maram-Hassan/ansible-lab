@@ -1,8 +1,100 @@
----
+# ---
+# - hosts: nexus_server
+#   become: yes
+#   tasks:
+  
+#     - name: Update the system package index
+#       apt: 
+#         update_cache: yes
+#       when: ansible_os_family == 'Debian'
+
+#     - name: Install Java (OpenJDK 11)
+#       apt: 
+#         name: openjdk-11-jdk
+#         state: present
+#       when: ansible_os_family == 'Debian'
+        
+#     - name: Download Nexus
+#       get_url:
+#         url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+#         dest: /tmp/nexus.tar.gz
+
+#     - name: Extract Nexus
+#       unarchive:
+#         src: /tmp/nexus.tar.gz
+#         dest: /opt
+#         remote_src: yes
+
+#     - name: Rename the extracted directory
+#       command: mv /opt/nexus-3.72.0-04 /opt/nexus
+
+#     - name: Create Nexus user
+#       user:
+#         name: nexus
+#         home: /opt/nexus
+#         shell: /bin/bash
+
+#     - name: Change ownership of Nexus directories
+#       file:
+#         path: /opt/nexus
+#         owner: nexus
+#         group: nexus
+#         recurse: yes
+
+#     - name: Configure Nexus to run as nexus user
+#       lineinfile:
+#         path: /opt/nexus/bin/nexus.rc
+#         regexp: '^#run_as_user='
+#         line: 'run_as_user="nexus"'
+
+#     - name: Set Nexus to run as a service
+#       copy:
+#         content: |
+#           [Unit]
+#           Description=nexus service
+#           After=network.target
+
+#           [Service]
+#           Type=forking
+#           LimitNOFILE=65536
+#           ExecStart=/opt/nexus/bin/nexus start
+#           ExecStop=/opt/nexus/bin/nexus stop
+#           User=nexus
+#           Restart=on-abort
+
+#           [Install]
+#           WantedBy=multi-user.target
+#         dest: /etc/systemd/system/nexus.service
+
+#     - name: Reload systemd to apply new service
+#       systemd:
+#         daemon_reload: yes
+
+#     - name: Enable Nexus service
+#       systemd:
+#         name: nexus
+#         enabled: yes
+
+#     - name: Start Nexus service
+#       systemd:
+#         name: nexus
+#         state: started
+
+#     - name: Ensure Nexus port (8081) is open
+#       ufw:
+#         rule: allow
+#         port: '8081'
+#         proto: tcp
+#         state: enabled
+#       when: ansible_os_family == 'Debian'
+
+
+        
+
 - hosts: nexus_server
   become: yes
   tasks:
-  
+
     - name: Update the system package index
       apt: 
         update_cache: yes
@@ -26,13 +118,209 @@
         remote_src: yes
 
     - name: Rename the extracted directory
-      command: mv /opt/nexus-3* /opt/nexus
+      command: mv /opt/nexus-3.72.0-04 /opt/nexus
 
     - name: Create Nexus user
       user:
         name: nexus
         home: /opt/nexus
         shell: /bin/bash
+
+    - name: Change ownership of Nexus directories
+      file:
+        path: /opt/nexus
+        owner: nexus
+        group: nexus
+        recurse: yes
+
+    - name: Change ownership of Sonatype work directory
+      command: chown -R nexus:nexus /opt/sonatype-work/nexus3
+
+    - name: Set permissions for Sonatype work directory
+      command: chmod -R 755 /opt/sonatype-work/nexus3
+
+    - name: Configure Nexus to run as nexus user
+      lineinfile:
+        path: /opt/nexus/bin/nexus.rc
+        regexp: '^#run_as_user='
+        line: 'run_as_user="nexus"'
+
+    - name: Set Nexus to run as a service
+      copy:
+        content: |
+          [Unit]
+          Description=nexus service
+          After=network.target
+
+          [Service]
+          Type=forking
+          LimitNOFILE=65536
+          ExecStart=/opt/nexus/bin/nexus start
+          ExecStop=/opt/nexus/bin/nexus stop
+          User=nexus
+          Restart=on-abort
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/nexus.service
+
+    - name: Reload systemd to apply new service
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable Nexus service
+      systemd:
+        name: nexus
+        enabled: yes
+
+    - name: Restart Nexus service
+      systemd:
+        name: nexus
+        state: restarted
+
+    - name: Ensure Nexus port (8081) is open
+      ufw:
+        rule: allow
+        port: '8081'
+        proto: tcp
+        state: enabled
+      when: ansible_os_family == 'Debian'
+
+  become: yes
+  tasks:
+
+    - name: Update the system package index
+      apt: 
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Install Java (OpenJDK 11)
+      apt: 
+        name: openjdk-11-jdk
+        state: present
+      when: ansible_os_family == 'Debian'
+        
+    - name: Download Nexus
+      get_url:
+        url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+        dest: /tmp/nexus.tar.gz
+
+    - name: Extract Nexus
+      unarchive:
+        src: /tmp/nexus.tar.gz
+        dest: /opt
+        remote_src: yes
+
+    - name: Rename the extracted directory
+      command: mv /opt/nexus-3.72.0-04 /opt/nexus
+
+    - name: Create Nexus user
+      user:
+        name: nexus
+        home: /opt/nexus
+        shell: /bin/bash
+
+    - name: Change ownership of Nexus directories
+      file:
+        path: /opt/nexus
+        owner: nexus
+        group: nexus
+        recurse: yes
+
+    - name: Change ownership of Sonatype work directory
+      command: chown -R nexus:nexus /opt/sonatype-work/nexus3
+
+    - name: Set permissions for Sonatype work directory
+      command: chmod -R 755 /opt/sonatype-work/nexus3
+
+    - name: Configure Nexus to run as nexus user
+      lineinfile:
+        path: /opt/nexus/bin/nexus.rc
+        regexp: '^#run_as_user='
+        line: 'run_as_user="nexus"'
+
+    - name: Set Nexus to run as a service
+      copy:
+        content: |
+          [Unit]
+          Description=nexus service
+          After=network.target
+
+          [Service]
+          Type=forking
+          LimitNOFILE=65536
+          ExecStart=/opt/nexus/bin/nexus start
+          ExecStop=/opt/nexus/bin/nexus stop
+          User=nexus
+          Restart=on-abort
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/nexus.service
+
+    - name: Reload systemd to apply new service
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable Nexus service
+      systemd:
+        name: nexus
+        enabled: yes
+
+    - name: Restart Nexus service
+      systemd:
+        name: nexus
+        state: restarted
+
+    - name: Ensure Nexus port (8081) is open
+      ufw:
+        rule: allow
+        port: '8081'
+        proto: tcp
+        state: enabled
+      when: ansible_os_family == 'Debian'
+  become: yes
+  tasks:
+
+    - name: Update the system package index
+      apt: 
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Install Java (OpenJDK 11)
+      apt: 
+        name: openjdk-11-jdk
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Download Nexus
+      get_url:
+        url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+        dest: /tmp/nexus.tar.gz
+
+    - name: Extract Nexus
+      unarchive:
+        src: /tmp/nexus.tar.gz
+        dest: /opt
+        remote_src: yes
+
+    - name: Rename the extracted directory
+      command: mv /opt/nexus-3.72.0-04 /opt/nexus
+
+    - name: Create Nexus user
+      user:
+        name: nexus
+        home: /opt/nexus
+        shell: /bin/bash
+
+    - name: Create sonatype-work directory
+      file:
+        path: /opt/sonatype-work/nexus3
+        state: directory
+        owner: nexus
+        group: nexus
+        mode: '0755'
+        recurse: yes
 
     - name: Change ownership of Nexus directories
       file:
@@ -86,4 +374,13 @@
         port: '8081'
         proto: tcp
         state: enabled
-        when: ansible_os_family == 'Debian'
+      when: ansible_os_family == 'Debian'
+
+    # Ensure permissions for sonatype-work
+    - name: Set correct ownership and permissions for sonatype-work
+      file:
+        path: /opt/sonatype-work/nexus3
+        owner: nexus
+        group: nexus
+        mode: '0755'
+        recurse: yes
