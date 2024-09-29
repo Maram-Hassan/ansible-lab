@@ -17,7 +17,8 @@ pipeline {
             
                     sh """
                     # Run the Ansible playbook using the private key and inventory
-                       ansible-playbook play-book.yml -i inventory.txt --private-key ansible-ec2-key.pem --ssh-extra-args '-o StrictHostKeyChecking=no'
+                       withCredentials([file(credentialsId: 'ssh-ansible', variable: 'ssh-ansible')]) {
+                       ansible-playbook play-book.yml -i inventory.txt --private-key ${ssh-ansible} --ssh-extra-args '-o StrictHostKeyChecking=no'
 
                     """
                 
