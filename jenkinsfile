@@ -8,8 +8,6 @@ pipeline {
                 // Clone the GitHub repository containing the Ansible playbook
                 git url: 'https://github.com/Maram-Hassan/ansible-lab.git', 
                     branch: 'main', 
-                    credentialsId: 'dd22c8fd-509b-467e-a5ee-10e58593b2c9' 
-                    // Adjust to your GitHub credentials ID
             }
         }
           stage('Install Nexus') {
