@@ -4,19 +4,20 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                // Clone the GitHub repository containing the Ansible playbook
                 git url: 'https://github.com/Maram-Hassan/ansible-lab.git', branch: 'main'
             }
         }
         stage('Install Nexus') {
             steps {
-                // Run the Ansible playbook using the private key and inventory
                 withCredentials([sshUserPrivateKey(credentialsId: 'b7728db5-7ee2-4294-afe8-fcaa0aaf4a2c', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
-                    sh """
-                    ansible-playbook play-book.yml -i inventory.txt --private-key ${SSH_KEY} --user ${SSH_USER} --ssh-extra-args '-o StrictHostKeyChecking=no'
-                    """
+                    // Using environment variables to pass the SSH key securely
+                    sh '''
+                    chmod 600 ${SSH_KEY}  # Fix permissions for SSH key
+                    ansible-playbook play-book.yml -i inventory.txt --private-key ${SSH_KEY} --user ${SSH_USER} --ssh-extra-args "-o StrictHostKeyChecking=no"
+                    '''
                 }
             }
         }
     }
 }
+
