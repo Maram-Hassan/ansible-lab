@@ -6,25 +6,18 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the GitHub repository containing the Ansible playbook
-                git url: 'https://github.com/Maram-Hassan/ansible-lab.git', 
-                    branch: 'main', 
+                git url: 'https://github.com/Maram-Hassan/ansible-lab.git', branch: 'main'
             }
         }
-          stage('Install Nexus') {
+        stage('Install Nexus') {
             steps {
-            
+                // Run the Ansible playbook using the private key and inventory
+                withCredentials([file(credentialsId: 'ssh-ansible', variable: 'SSH_KEY')]) {
                     sh """
-                    # Run the Ansible playbook using the private key and inventory
-                       withCredentials([file(credentialsId: 'ssh-ansible', variable: 'ssh-ansible')]) {
-                       ansible-playbook play-book.yml -i inventory.txt --private-key ${ssh-ansible} --ssh-extra-args '-o StrictHostKeyChecking=no'
-
+                    ansible-playbook play-book.yml -i inventory.txt --private-key ${SSH_KEY} --ssh-extra-args '-o StrictHostKeyChecking=no'
                     """
-                
+                }
             }
         }
-
-        
     }
 }
-
-           
