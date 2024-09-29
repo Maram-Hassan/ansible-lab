@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -12,9 +11,9 @@ pipeline {
         stage('Install Nexus') {
             steps {
                 // Run the Ansible playbook using the private key and inventory
-                withCredentials([file(credentialsId: 'b7728db5-7ee2-4294-afe8-fcaa0aaf4a2c', variable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'b7728db5-7ee2-4294-afe8-fcaa0aaf4a2c', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                     sh """
-                    ansible-playbook play-book.yml -i inventory.txt --private-key ${SSH_KEY} --ssh-extra-args '-o StrictHostKeyChecking=no'
+                    ansible-playbook play-book.yml -i inventory.txt --private-key ${SSH_KEY} --user ${SSH_USER} --ssh-extra-args '-o StrictHostKeyChecking=no'
                     """
                 }
             }
