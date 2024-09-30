@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/Maram-Hassan/ansible-lab.git', branch: 'main'
+                git url: 'https://github.com/Maram-Hassan/install-nexus.git', branch: 'main'
             }
         }
         stage('Install Nexus') {
